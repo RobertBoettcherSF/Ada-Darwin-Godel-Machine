@@ -29,7 +29,7 @@ begin
    -- TEST 1
    Put_Line ("TEST 1 — Agent Creation");
    declare
-      A : Agent_State := Create_Agent (42, 75.5, 100);
+      A : constant Agent_State := Create_Agent (42, 75.5, 100);
    begin
       Check ("1.1 Correct ID", A.Id = 42);
       Check ("1.2 Correct Fitness", A.Fitness = 75.5);
@@ -39,7 +39,7 @@ begin
    -- TEST 2
    Put_Line ("TEST 2 — Static Environment Evaluation");
    declare
-      A : Agent_State := Create_Agent (1, 50.0, 50);
+      A : constant Agent_State := Create_Agent (1, 50.0, 50);
       E : constant Fitness_Value := Evaluate (A, Static_Env);
    begin
       Check ("2.1 Eval static matches exactly", E = 50.0);
@@ -50,8 +50,8 @@ begin
    -- TEST 3
    Put_Line ("TEST 3 — Dynamic Environment Evaluation");
    declare
-      A_Low  : Agent_State := Create_Agent (1, 50.0, 50);
-      A_High : Agent_State := Create_Agent (2, 50.0, 200);
+      A_Low  : constant Agent_State := Create_Agent (1, 50.0, 50);
+      A_High : constant Agent_State := Create_Agent (2, 50.0, 200);
    begin
       Check ("3.1 No penalty for low complexity", Evaluate (A_Low, Dynamic_Env) = 50.0);
       Check ("3.2 Penalty applied for high complexity", Evaluate (A_High, Dynamic_Env) < 50.0);
@@ -61,8 +61,8 @@ begin
    -- TEST 4
    Put_Line ("TEST 4 — Strict Verification (Success)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
-      Cand : Agent_State := Create_Agent (2, 60.0, 110);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
+      Cand : constant Agent_State := Create_Agent (2, 60.0, 110);
    begin
       Check ("4.1 strict passes with higher fitness & bounded complexity", Verify_Strict (Base, Cand, Static_Env));
       Check ("4.2 heuristic also passes", Verify_Heuristic (Base, Cand, Static_Env));
@@ -72,8 +72,8 @@ begin
    -- TEST 5
    Put_Line ("TEST 5 — Strict Verification (Fail via Complexity)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
-      Cand : Agent_State := Create_Agent (2, 60.0, 200);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
+      Cand : constant Agent_State := Create_Agent (2, 60.0, 200);
    begin
       Check ("5.1 strict fails due to complexity > base+50", not Verify_Strict (Base, Cand, Static_Env));
       Check ("5.2 heuristic still passes", Verify_Heuristic (Base, Cand, Static_Env));
@@ -83,8 +83,8 @@ begin
    -- TEST 6
    Put_Line ("TEST 6 — Strict Verification (Fail via Fitness)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
-      Cand : Agent_State := Create_Agent (2, 40.0, 100);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
+      Cand : constant Agent_State := Create_Agent (2, 40.0, 100);
    begin
       Check ("6.1 strict fails due to lower fitness", not Verify_Strict (Base, Cand, Static_Env));
       Check ("6.2 heuristic also fails", not Verify_Heuristic (Base, Cand, Static_Env));
@@ -94,11 +94,11 @@ begin
    -- TEST 7
    Put_Line ("TEST 7 — Exhaustive Evolution (Improvement Found)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
       Pop  : constant Agent_Array (1 .. 3) :=
-        (1 => Create_Agent (2, 55.0, 100),
+        [1 => Create_Agent (2, 55.0, 100),
          2 => Create_Agent (3, 70.0, 100),
-         3 => Create_Agent (4, 60.0, 100));
+         3 => Create_Agent (4, 60.0, 100)];
       Result : constant Agent_State := Evolve_Exhaustive (Base, Pop, Static_Env);
    begin
       Check ("7.1 picks the highest verified fitness", Result.Id = 3);
@@ -109,10 +109,10 @@ begin
    -- TEST 8
    Put_Line ("TEST 8 — Exhaustive Evolution (No Improvement)");
    declare
-      Base : Agent_State := Create_Agent (1, 80.0, 100);
+      Base : constant Agent_State := Create_Agent (1, 80.0, 100);
       Pop  : constant Agent_Array (1 .. 2) :=
-        (1 => Create_Agent (2, 55.0, 100),
-         2 => Create_Agent (3, 70.0, 100));
+        [1 => Create_Agent (2, 55.0, 100),
+         2 => Create_Agent (3, 70.0, 100)];
       Result : constant Agent_State := Evolve_Exhaustive (Base, Pop, Static_Env);
    begin
       Check ("8.1 picks base agent when candidates fail verification", Result.Id = 1);
@@ -123,11 +123,11 @@ begin
    -- TEST 9
    Put_Line ("TEST 9 — Preemptive Evolution (Early Stop)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
       Pop  : constant Agent_Array (1 .. 3) :=
-        (1 => Create_Agent (2, 55.0, 100),
+        [1 => Create_Agent (2, 55.0, 100),
          2 => Create_Agent (3, 65.0, 200),
-         3 => Create_Agent (4, 80.0, 100));
+         3 => Create_Agent (4, 80.0, 100)];
       Result : constant Agent_State := Evolve_Preemptive (Base, Pop, Static_Env, 10.0);
    begin
       -- Threshold is 60.0. Cand 1=55(fail), Cand 2=65(passes preemptive heuristic!)
@@ -139,10 +139,10 @@ begin
    -- TEST 10
    Put_Line ("TEST 10 — Preemptive Evolution (None Meet Threshold)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
       Pop  : constant Agent_Array (1 .. 2) :=
-        (1 => Create_Agent (2, 55.0, 100),
-         2 => Create_Agent (3, 58.0, 100));
+        [1 => Create_Agent (2, 55.0, 100),
+         2 => Create_Agent (3, 58.0, 100)];
       Result : constant Agent_State := Evolve_Preemptive (Base, Pop, Static_Env, 10.0);
    begin
       Check ("10.1 returns base if target threshold is not achieved", Result.Id = 1);
@@ -153,10 +153,10 @@ begin
    -- TEST 11
    Put_Line ("TEST 11 — Dynamic Environment Interactions (Preemptive Search)");
    declare
-      Base : Agent_State := Create_Agent (1, 50.0, 100);
+      Base : constant Agent_State := Create_Agent (1, 50.0, 100);
       Pop  : constant Agent_Array (1 .. 2) :=
-        (1 => Create_Agent (2, 70.0, 400),
-         2 => Create_Agent (3, 60.0, 100));
+        [1 => Create_Agent (2, 70.0, 400),
+         2 => Create_Agent (3, 60.0, 100)];
       Result : constant Agent_State := Evolve_Preemptive (Base, Pop, Dynamic_Env, 5.0);
    begin
       -- Target=55.0. Cand 1 penalty=(400-100)*.1=30, eval=40(fail). Cand 2 penalty=0, eval=60(pass).
@@ -168,8 +168,8 @@ begin
    -- TEST 12
    Put_Line ("TEST 12 — Empty Population Edge Case");
    declare
-      Base : Agent_State := Create_Agent (1, 10.0, 10);
-      Empty_Pop : constant Agent_Array (1 .. 0) := (others => Base);
+      Base : constant Agent_State := Create_Agent (1, 10.0, 10);
+      Empty_Pop : constant Agent_Array (1 .. 0) := [others => Base];
       Ex_Caught : Boolean := False;
       Pr_Caught : Boolean := False;
    begin
@@ -178,7 +178,7 @@ begin
             Dummy : Agent_State;
          begin
             Dummy := Evolve_Exhaustive (Base, Empty_Pop, Static_Env);
-            Check ("Should not reach here", Dummy.Id = 0);
+            Check ("Should not reach here", Dummy.Id = Positive'Last);
          exception
             when Population_Empty_Error => Ex_Caught := True;
          end;
@@ -190,7 +190,7 @@ begin
             Dummy : Agent_State;
          begin
             Dummy := Evolve_Preemptive (Base, Empty_Pop, Static_Env, 5.0);
-            Check ("Should not reach here", Dummy.Id = 0);
+            Check ("Should not reach here", Dummy.Id = Positive'Last);
          exception
             when Population_Empty_Error => Pr_Caught := True;
          end;
@@ -202,8 +202,8 @@ begin
    -- TEST 13
    Put_Line ("TEST 13 — Exceptions & Constraints");
    declare
-      Base : Agent_State := Create_Agent (1, 10.0, 10);
-      Pop  : constant Agent_Array (1 .. 1) := (1 => Create_Agent (2, 20.0, 10));
+      Base : constant Agent_State := Create_Agent (1, 10.0, 10);
+      Pop  : constant Agent_Array (1 .. 1) := [1 => Create_Agent (2, 20.0, 10)];
       Thresh_Caught : Boolean := False;
       CE_Caught : Boolean := False;
    begin
@@ -212,7 +212,7 @@ begin
             Dummy : Agent_State;
          begin
             Dummy := Evolve_Preemptive (Base, Pop, Static_Env, 0.0);
-            Check ("Should not reach here", Dummy.Id = 0);
+            Check ("Should not reach here", Dummy.Id = Positive'Last);
          exception
             when Invalid_Threshold => Thresh_Caught := True;
          end;
@@ -224,7 +224,7 @@ begin
             Bad_Fit : Fitness_Value;
          begin
             Bad_Fit := Fitness_Value (Get_OOB);
-            Check ("Should not reach here", Bad_Fit > 0.0);
+            Check ("Should not reach here", Bad_Fit = Fitness_Value'Last);
          exception
             when Constraint_Error => CE_Caught := True;
          end;
